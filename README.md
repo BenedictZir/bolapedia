@@ -11,20 +11,20 @@ Link aplikasi PWS: https://benedictus-lucky-bolapedia.pbp.cs.ui.ac.id/
     - Setelah selesai semua, saya membuat README.md ini sekaligus melakukan deployment di PWS.
 
 2. Buatlah bagan yang berisi request client ke web aplikasi berbasis Django beserta responnya dan jelaskan pada bagan tersebut kaitan antara urls.py, views.py, models.py, dan berkas html.
-    -https://drive.google.com/file/d/1qhKZSit5N2rBlEuY6xgZBaL7onrIGIsp/view?usp=sharing
-    -Request dari client dikirim ke server Django dan dicocokkan dengan urls.py yang cocok.
-    -Setelah menemukan pola yang sesuai, Django meneruskan request ke views.py
-    -views.py akan bertindak sebagai otak, jika butuh data views.py akan meminta ke models.py
-    -Jika sudah memiliki data yang dibutuhkan, views.py akan mengirim data tersebut ke template untuk dirender
-    -Setelah dirender, views.py mengembalikan HTML ini ke client dan browser menampilkan halaman tersebut.
+    - https://drive.google.com/file/d/1qhKZSit5N2rBlEuY6xgZBaL7onrIGIsp/view?usp=sharing
+    - Request dari client dikirim ke server Django dan dicocokkan dengan urls.py yang cocok.
+    - Setelah menemukan pola yang sesuai, Django meneruskan request ke views.py
+    - views.py akan bertindak sebagai otak, jika butuh data views.py akan meminta ke models.py
+    - Jika sudah memiliki data yang dibutuhkan, views.py akan mengirim data tersebut ke template untuk dirender
+    - Setelah dirender, views.py mengembalikan HTML ini ke client dan browser menampilkan halaman tersebut.
 
 3. Jelaskan peran settings.py dalam proyek Django!
-    -Settings.py berisi konfigurasi utama django seperti database, app, template path, secret keys, allowed host, dan lain-lain.
+    - Settings.py berisi konfigurasi utama django seperti database, app, template path, secret keys, allowed host, dan lain-lain.
 
 4. Bagaimana cara kerja migrasi database di Django?
-    -Pertama, ketik python manage.py makemigrations di terminal untuk membuat file migrasi (sebagai instruksi perubahan database)
-    -Lalu, gunakan python manage.py migrate untuk mengeksekusi instruksi perubahan yang kita lakukan sebelumnya
-    -Setelah melakukan kedua hal tersebut, database telah berhasil mengikuti perubahan models saat ini
+    - Pertama, ketik python manage.py makemigrations di terminal untuk membuat file migrasi (sebagai instruksi perubahan database)
+    - Lalu, gunakan python manage.py migrate untuk mengeksekusi instruksi perubahan yang kita lakukan sebelumnya
+    - Setelah melakukan kedua hal tersebut, database telah berhasil mengikuti perubahan models saat ini
 
 5. Menurut Anda, dari semua framework yang ada, mengapa framework Django dijadikan permulaan pembelajaran pengembangan perangkat lunak?
     - Fitur bawaan banyak yang bisa langsung digunakan untuk membantu pengembangan aplikasi, terutama bagi para pemula
@@ -35,4 +35,4 @@ Link aplikasi PWS: https://benedictus-lucky-bolapedia.pbp.cs.ui.ac.id/
     - Django juga fleksibel, bisa digunakan untuk berbagai jenis aplikasi, dari sederhana hingga yang kompleks 
 
 6. Apakah ada feedback untuk asisten dosen tutorial 1 yang telah kamu kerjakan sebelumnya?
-    -Tidak ada, tutorialnya sudah cukup jelas dan mudah diikuti. 
+    - Tidak ada, tutorialnya sudah cukup jelas dan mudah diikuti. 
