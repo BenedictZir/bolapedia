@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-zdev-($tqci()pej#-^gux=llavl*n!kq5-xuoy3go7*g77(5$
 PRODUCTION = os.getenv('PRODUCTION', 'False').lower() == 'true'
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", " 127.0.0.1"]
+ALLOWED_HOSTS = ["localhost", " 127.0.0.1", "benedictus-lucky-bolapedia.pbp.cs.ui.ac.id"]
 
 
 # Application definition
