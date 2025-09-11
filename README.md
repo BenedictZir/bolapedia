@@ -1,3 +1,4 @@
+Tugas 2:
 Link aplikasi PWS: https://benedictus-lucky-bolapedia.pbp.cs.ui.ac.id/
 
 1. Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step (bukan hanya sekadar mengikuti tutorial).
@@ -35,4 +36,32 @@ Link aplikasi PWS: https://benedictus-lucky-bolapedia.pbp.cs.ui.ac.id/
     - Django juga fleksibel, bisa digunakan untuk berbagai jenis aplikasi, dari sederhana hingga yang kompleks 
 
 6. Apakah ada feedback untuk asisten dosen tutorial 1 yang telah kamu kerjakan sebelumnya?
+    - Tidak ada, tutorialnya sudah cukup jelas dan mudah diikuti. 
+
+
+Tugas 3:
+
+1. Jelaskan mengapa kita memerlukan data delivery dalam pengimplementasian sebuah platform?
+    - Dengan data delivery, aplikasi yang kita buat menjadi lebih fleksibel dan lebih scalable. Kita bisa memisahkan bagian backend dan frontend, logika dan database diurus di backend, frontend tinggal menampilkan data-data tersebut. Lalu, kita jadi lebih mudah melakukan integrasi dengan platform lain. 
+
+2. Menurutmu, mana yang lebih baik antara XML dan JSON? Mengapa JSON lebih populer dibandingkan XML?
+    - Menurut saya pribadi, JSON lebih baik dari XML. Hal ini dikarenakan bagi saya JSON lebih mudah untuk dibaca, bentukannya mirip seperti dictionary python. Lalu, dari riset saya JSON lebih populer dan disukai oleh lebih banyak orang juga. Selain karena lebih mudah dibaca, ukuran file lebih kecil dan struktur datanya lebih sederhana sehingga lebih mudah diproses.
+
+3. Jelaskan fungsi dari method is_valid() pada form Django dan mengapa kita membutuhkan method tersebut?
+    - Method is_valid() akan mengembalikan nilai true apabila data yang dikirim melalui form sudah sesuai (valid) dengan yang didefinisikan oleh form. Kita bisa cek nilai hasil is_valid() dan hanya memasukkan data valid ke databse jika true. Dengan ini, kita bisa mencegah data berbahaya atau invalid masuk ke database.
+
+4. Mengapa kita membutuhkan csrf_token saat membuat form di Django? Apa yang dapat terjadi jika kita tidak menambahkan csrf_token pada form Django? Bagaimana hal tersebut dapat dimanfaatkan oleh penyerang?
+    - Kita memerlukan cstf_token untuk memastikan request sah yang diterima server. Jika kita tidak menambahkannya, user bisa mengirim request yang merugikan mereka tanpa kehendak mereka. Misalkan penyerang memberi link berbahaya yang membuat user mengirim request untuk transfer uang. 
+
+5. Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step (bukan hanya sekadar mengikuti tutorial).
+    - Menambahkan fungsi-fungsi di views untuk melihat objek dalam format JSON atau XML, juga membuat fungsi yang hanya meliat 1 objek dengan id yang kita inginkan. Cara membuatnya dengan mengambil semua object yang sudah dibuat (atau satu objek jika menggunakan id) lalu melakukan serialize dengan format sesuai fungsinya lalu di kembalikan sebagai HTTPResponse
+    - Setelah membuat fungsi-fungsi itu, saya menambahkan path yang sesuai fungsi-fungsi tersebut di urls.py milik direktori main.
+    - Saya membuat struktur form yang dapat menerima data product baru sehingga user bisa menambahkan product di aplikasi.
+    - Selanjutnya, saya membuat template base.html yang akan digunakan untuk diturunkan di page-page lain. 
+    - Saya lalu membuat template untuk halaman detail produk dan halaman ketika add product.
+    - Setelah itu, saya membuat dua fungsi baru di views.py untuk bagian add product dan lihat detail product, masing-masing fungsi tersebut membawa user ke page yang sesuai.
+    - Lalu saya menambahkan path yang sesuai dua fungsi itu di urls.py
+    - Setelah selesai semua, saya melanjutkan README.md ini sekaligus melakukan push di PWS dan github.
+
+6. Apakah ada feedback untuk asdos di tutorial 2 yang sudah kalian kerjakan?
     - Tidak ada, tutorialnya sudah cukup jelas dan mudah diikuti. 
