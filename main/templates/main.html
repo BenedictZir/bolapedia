@@ -32,9 +32,9 @@
   <img src="{{ product.thumbnail }}" alt="thumbnail" width="150" height="100">
   <br />
   {% endif %}
-  <p>{{ product.brand }}</p>
-  <p>{{ product.price }}</p>
-  <p>{{ product.stock }}</p>
+  <p>Brand: {{ product.brand }}</p>
+  <p>Harga: {{ product.price }}</p>
+  <p>Stok: {{ product.stock }}</p>
   <p>{{ product.description|truncatewords:25 }}...</p>
 
   <p><a href="{% url 'main:show_product' product.id %}"><button>Read More</button></a></p>
