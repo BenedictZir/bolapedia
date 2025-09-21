@@ -65,3 +65,59 @@ Tugas 3:
 
 6. Apakah ada feedback untuk asdos di tutorial 2 yang sudah kalian kerjakan?
     - Tidak ada, tutorialnya sudah cukup jelas dan mudah diikuti. 
+
+Tugas 4:
+
+1. Apa itu Django AuthenticationForm? Jelaskan juga kelebihan dan kekurangannya.
+    - AuthenticationForm adalah form bawaan Django yang digunakan untuk autentikasi user. Form ini digunakan di halaman login. Form tersebut memiliki field username dan field password. Setelah itu akan dilakukan validasi terhadap kredensial user dengan database Django.
+    - Kelebihan:
+        - Sudah terintegrasi dengan sistem autentikasi Django, jadi kita tidak perlu membuat validasi manual.
+        - Form ini sudah memiliki handling error otomatis, misal jika password salah atau akun tidak ada.
+    - Kekurangan:
+        - Form ini cukup generik, sehingga developer perlu kustomisasi tambahan jika ingin membuat sistem login yang lebih kompleks.
+        - Tampilan form ini sederhana, sehingga hampir selalu diubah tampilannya menyesuaikan UI aplikasi.
+
+2. Apa perbedaan antara autentikasi dan otorisasi? Bagaiamana Django mengimplementasikan kedua konsep tersebut?
+    - Autentikasi adalah proses mengidentifikasi identitas user, sedangkan otorisasi adalah proses menentukan hak akses pada user.
+    - Django mengimplementasikan proses autentikasi ini dengan menyediakan sistem User bawaan, form login bawaan (AuthenticationForm), dan backend autentikasi.
+    - Django mengimplementasikan proses otorisasi dengan memiliki sistem permission dan group. Pembuat aplikasi dapat menentukan apakah seorang user memiliki akses tertentu.
+
+3. Apa saja kelebihan dan kekurangan session dan cookies dalam konteks menyimpan state di aplikasi web?
+    - Sessions:
+        - Kelebihan:
+            - Data tersimpan di server sehingga lebih aman.
+            - Bisa menyimpan informasi lebih kompleks karna hanya session ID yang dikirim ke client.
+        - Kekurangan:
+            - Karna disimpan di server, maka perlu penyimpanan tambahan di server.
+            - Skalabilitas lebih kompleks untuk aplikasi yang memiliki banyak user.
+    - Cookies:
+        - Kelebihan:
+            - Data langsung tersimpan di browser user.
+            - Tidak perlu storage khusus di server.
+        - Kekurangan:
+            - Rentan dimodifikasi atau dicuri.
+            - Kapasitas penyimpanan kecil
+    
+4. Apakah penggunaan cookies aman secara default dalam pengembangan web, atau apakah ada risiko potensial yang harus diwaspadai? Bagaimana Django menangani hal tersebut?
+    - Secara default, penggunaan cookies kurang aman karna memiliki beberapa resiko. Contohnya jika cookie dicuri orang lain yang mana berisi session id, pencuri dapat menyamar sebagai korban. Selain itu, karna cookie otomatis terkirim tiap request, attacker bisa mengirim request palsu dengan cookie session yang masih valid.
+    - Django sudah menyiapkan mekanisme bawaaan untuk menghindari resiko-resiko yang ditimbulkan penggunaan cookies.
+        - HttpOnly cookies, Django set cookie session sebagai HttpOnly, jadi cookie tidak bisa dibaca lewat JavaScript sehingga aman dari serangan XSS sederhana.
+        - Secure Flag, jika flag ini diaktifkan cookie hanya dikirim lewat HTTPS.
+        - Proteksi Csrf bawaan, Django punya csrf token dan middleware yang mamvalidasi setiap FORM post
+        - Session ID saja yang disimpan dan bukan data aslinya. Sehingga walau cookie dibaca penyerang, penyerang hanya bisa melihat ID bukan data aslinya.
+
+5.  Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step (bukan hanya sekadar mengikuti tutorial).
+    - Pertama-tama membuat fungsi register di views.py dengan UserCreationForm bawaan Django untuk bagian registrasi akun user. Setelah membuat fungsi register, membuat juga halaman register beserta melakukan routing untuk halaman register itu.
+    - Setelah membuat fungsi register, sekarang untuk bagian login. Seperti register, saya membuat fungsi login_user di views.py dengan AuthenticationForm bawaan Django, lalu mmebuat halaman login dan routingnya.
+    - Lalu membuat fungsi logout_user yang dapat dipanggil dengan memencet button di halaman main, yang berisi fungsi logout bawaan Django.
+    - Setelah selesai membuat mekanisme registrasi beserta login dan logout, saya memberikan decorator login_required diatas fungsi di views.py. Hal ini agar untuk mengakses halaman-halaman dari fungsi tersebut, user harus login terlebih dahulu. Disini untuk memanggil show_main dan show_product kita pastikan harus login dan kita alihkan ke halaman login.
+    
+    - Untuk menghubungkan model Product dengan User, pertama kita update model product di models.py dan tambahkan atribut User (bawaan Django) di dalam model product.
+    - Setelah itu saya mengupdate fungsi create_product di views.py agar menambahkan user yang memberi request untuk membuat product sebagai pemilik product tersebut.
+    - Di fungsi show_main dan halaman main.html saya berikan opsi untuk menunjukkan product milik user saja atau milik semua user.
+    - Lalu saya juga menambahkan nama user pemilik product tersebut di halaman product_detail.
+
+
+    - Untuk menerapkan menampilkan data user yang sedang login dengan cookies, pertama kita tambahkan set_cookie bernama last_login di fungsi login_user yang akan menyimpan cookie berisi timestamp.
+    - Selain itu, saya menambahkan delete_cookie di fungsi logout_user untuk menghapus cookie last_login ketika user melakukan logout.
+    - Terakhir, saya menampilkan cookie tersebut di context yang akan ditampilkan halaman main.
