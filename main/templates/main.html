@@ -1,60 +1,108 @@
- {% extends 'base.html' %}
- {% block content %}
-<h4>Nama aplikasi: </h4>
-<p>{{ nama_aplikasi }}</p> 
-<h4>Nama: </h4>
-<p>{{ nama }}</p> 
-<h4>NPM: </h4>
-<p>{{ npm }}</p> 
-<h4>Kelas: </h4>
-<p>{{ kelas }}</p>
-<a href="{% url 'main:create_product' %}">
-  <button>+ Add Product</button>
-</a>
+{% extends 'base.html' %}
+{% load static %}
 
-<a href="{% url 'main:logout' %}">
-  <button>Logout</button>
-</a>
-<h5>Sesi terakhir login: {{ last_login }}</h5>
-<hr>
+{% block meta %}
+<title>Bolapedia - Your Ultimate Football Products Hub</title>
+{% endblock meta %}
 
-<a href="?filter=all">
-    <button type="button">All Product</button>
-</a>
-<a href="?filter=my">
-    <button type="button">My Product</button>
-</a> 
+{% block content %}
+{% include 'navbar.html' %}
 
-<hr>
-
-{% if not product_list %}
-<p>Belum ada data product pada bolapedia.</p>
-{% else %}
-
-{% for product in product_list %}
-<div>
-  <h2><a href="{% url 'main:show_product' product.id %}">{{ product.name }}</a></h2>
-
-<p>
-  <b>{{ product.get_category_display }}</b>
-  {% if product.is_featured %} | <b>Featured</b>{% endif %}
-  <i>{{ product.created_at|date:"d M Y H:i" }}</i>
-</p>
-
-  {% if product.thumbnail %}
-  <img src="{{ product.thumbnail }}" alt="thumbnail" width="150" height="100">
-  <br />
-  {% endif %}
-  <p>Brand: {{ product.brand }}</p>
-  <p>Harga: {{ product.price }}</p>
-  <p>Stok: {{ product.stock }}</p>
-  <p>{{ product.description|truncatewords:25 }}...</p>
-
-  <p><a href="{% url 'main:show_product' product.id %}"><button>Read More</button></a></p>
+<div class="bg-slate-50 border-b border-slate-200">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 text-center">
+    <h1 class="text-4xl sm:text-6xl font-extrabold text-slate-900 tracking-tight">
+      Discover Football's Best Gear
+    </h1>
+    <p class="mt-4 max-w-2xl mx-auto text-lg text-slate-600">
+      The ultimate hub for the football community to share and find amazing products.
+    </p>
+    <div class="mt-8 flex justify-center items-center gap-x-4">
+      <a href="{% url 'main:create_product' %}" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition">
+        Add Your Product
+      </a>
+      <a href="#products" class="px-6 py-3 bg-white text-slate-700 font-semibold rounded-lg border border-slate-300 hover:bg-slate-100 transition">
+        Explore Products
+      </a>
+    </div>
+  </div>
 </div>
 
-<hr>
-{% endfor %}
+<div id="products" class="bg-white w-full">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
 
+    {% if user.is_authenticated %}
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+      <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+        <div class="flex items-center">
+          <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center text-xl">👋</div>
+          <div class="ml-4">
+            <p class="text-sm text-slate-500">Welcome back!</p>
+            <p class="font-bold text-slate-800">{{ user.username }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+        <div class="flex items-center">
+          <div class="w-10 h-10 bg-green-100 text-green-600 rounded-lg flex items-center justify-center text-xl">📦</div>
+          <div class="ml-4">
+            <p class="text-sm text-slate-500">Total Products</p>
+            <p class="font-bold text-slate-800">{{ product_list|length }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+        <div class="flex items-center">
+          <div class="w-10 h-10 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center text-xl">📅</div>
+          <div class="ml-4">
+            <p class="text-sm text-slate-500">Last Login</p>
+            <p class="font-bold text-slate-800">{{ last_login}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="mb-10">
+      <h2 class="text-3xl font-bold text-slate-900">Latest Products</h2>
+      <div class="mt-4 border-b border-slate-200">
+        <nav class="-mb-px flex space-x-6">
+          <a href="?" class="py-3 px-1 border-b-2 font-semibold {% if request.GET.filter == 'all' or not request.GET.filter %}border-blue-600 text-blue-600{% else %}border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300{% endif %}">
+            All Products
+          </a>
+          <a href="?filter=my" class="py-3 px-1 border-b-2 font-semibold {% if request.GET.filter == 'my' %}border-blue-600 text-blue-600{% else %}border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300{% endif %}">
+            My Products
+          </a>
+        </nav>
+      </div>
+    </div>
+
+    {% if not product_list %}
+      <div class="text-center py-16 px-6 border-2 border-dashed border-slate-300 rounded-xl">
+        <div class="text-4xl mb-4">⚽</div>
+        <h3 class="text-xl font-semibold text-slate-800">No Products Yet!</h3>
+        <p class="text-slate-500 mt-2">Be the first to share an amazing product with the community.</p>
+        <a href="{% url 'main:create_product' %}" class="mt-6 inline-block px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition">
+          Create First Product
+        </a>
+      </div>
+    {% else %}
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+        {% for product in product_list %}
+          <div>
+            {% include 'card_product.html' with product=product %}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% if user.is_authenticated %}
+<div class="fixed bottom-6 right-6 z-40">
+  <a href="{% url 'main:create_product' %}" class="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl shadow-lg hover:bg-blue-700 transition">
+    <span>+</span>
+  </a>
+</div>
 {% endif %}
+
 {% endblock content %}

@@ -121,3 +121,46 @@ Tugas 4:
     - Untuk menerapkan menampilkan data user yang sedang login dengan cookies, pertama kita tambahkan set_cookie bernama last_login di fungsi login_user yang akan menyimpan cookie berisi timestamp.
     - Selain itu, saya menambahkan delete_cookie di fungsi logout_user untuk menghapus cookie last_login ketika user melakukan logout.
     - Terakhir, saya menampilkan cookie tersebut di context yang akan ditampilkan halaman main.
+
+Tugas 5:
+
+1.  Jika terdapat beberapa CSS selector untuk suatu elemen HTML, jelaskan urutan prioritas pengambilan CSS selector tersebut!
+    - Jika ada beberapa selector, urutan prioritasnya dari yang tertinggi adalah
+        - Inline style (paling prioritas)
+        - ID selector
+        - Classes, attribute selectors and pseudo-classes
+        - Elements and pseudo-elements
+        - Universal selector and :where()	
+
+2. Mengapa responsive design menjadi konsep yang penting dalam pengembangan aplikasi web? Berikan contoh aplikasi yang sudah dan belum menerapkan responsive design, serta jelaskan mengapa!
+    - Agar website lebih aksesibel ke banyak device dan orang serta meningkatkan user experience. Selain itu, membuat website yang responsive lebih efisien daripada membuat website berbeda untuk device berbeda.
+    - Contoh aplikasi yang sudah menerapkan seperti website tokopedia, yang belum itu seperti website atcoder.com (konten yang lebih besar tidak langsung disesuaikan di device yang lebih kecil sehingga user harus scroll horizontal)
+
+3. Jelaskan perbedaan antara margin, border, dan padding, serta cara untuk mengimplementasikan ketiga hal tersebut!
+    - Margin seperti bagian kosong dengan elemen lain, tujuannya agar elemen tidak menempel ke elemen lain.
+        - contoh cara implementasi: 
+            .box{
+                margin: 20px;
+            }
+    - Border itu garis yang mengelilingi elemen, berfungsi untuk memberi semacam frame untuk elemen tersebut.
+        - contoh cara implementasi:
+            .box{
+                border: 2px solid black;
+            }
+    - Padding itu ruang di dalam elemen, atau jarak antara konten dengan border.
+        - contoh cara implementasi:
+            .box{
+                padding: 15px;
+            }
+
+4.  Jelaskan konsep flex box dan grid layout beserta kegunaannya!
+    - Flexbox adalah sistem layout yang bisa otomatis mengatur elemen-elemen dalam 1 row atau 1 column. flex box otomatis menyesuaikan ukuran, posisi, dan jarak di berbagai ukuran layar. Berguna jika kita ingin membuat semacam 1 bar
+    - Grid adalah sistem layout 2 dimensi (punya baris dan kolom), kita bisa membuat semacam tabel dan mengatur kolom dan barisnya. Berguna jika ingin membuat halaman penuh seperti homepace ecommerce.
+
+5.  Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step (bukan hanya sekadar mengikuti tutorial)!
+    - Membuat fungsi bernama edit_product dan delete_product. Pada fungsi edit product, kita akan membuat form baru dan data di form baru yang diisi akan menggantikan data product itu. Lalu untuk yang delete_product, kita tinggal memanggil method delete bawaan model untuk menghapus product tersebut tadi database lalu kembali ke halaman main.
+    - Untuk kustomisasi menggunakan css, di base.html kita beri script dari tailwind dulu agar semua halaman yang mengextend base.html menggunakan tailwind.
+    - Selain itu kita juga membuat static file global.css berisi beberapa konfigurasi form dan checkbox agar semua halaman punya desain yang seragam.
+    - Untuk navbar, saya membuat navbar.html berisi tombol tombol seperti create product,  nama menggunakan tailwind. Di main.html saya buat include navbar diatas bagian halamannya. Di halaman navbar dibuat 2 versi untuk size medium dan jika size besar agar responsive.
+    - Untuk halaman lain menggunakan tailwind juga dengan style yang mirip-mirip
+    

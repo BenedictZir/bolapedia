@@ -1,27 +1,87 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block meta %}
+<title>{{ product.name }} - Bolapedia</title>
+{% endblock meta %}
+
 {% block content %}
-<p><a href="{% url 'main:show_main' %}"><button>← Back to Product List</button></a></p>
+{% include 'navbar.html' %}
 
-<h1>{{ product.title }}</h1>
-<p>
-  <b>{{ product.get_category_display }}</b>
-  {% if product.is_featured %} | <b>Featured</b>{% endif %}
-  <i>{{ product.created_at|date:"d M Y H:i" }}</i>
-</p>
+<div class="bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+    
+    <nav class="mb-8 text-sm font-medium text-slate-500">
+      <a href="{% url 'main:show_main' %}" class="hover:text-slate-700">Products</a>
+      <span class="mx-2">/</span>
+      <span class="text-slate-800">{{ product.name }}</span>
+    </nav>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16">
+      
+      <div>
+        <div class="aspect-square bg-slate-100 rounded-xl overflow-hidden border">
+          {% if product.thumbnail %}
+            <img src="{{ product.thumbnail}}" alt="{{ product.name }}" class="w-full h-full object-cover">
+          {% else %}
+            <div class="w-full h-full flex items-center justify-center text-5xl text-slate-400">⚽</div>
+          {% endif %}
+        </div>
+      </div>
+      
+      <div class="flex flex-col">
+        <div class="flex items-center gap-x-2 mb-3">
+          <span class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
+            {{ product.get_category_display }}
+          </span>
+          {% if product.is_featured %}
+            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">⭐ Featured</span>
+          {% endif %}
+        </div>
+        
+        <h1 class="text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">{{ product.name }}</h1>
+        
+        <p class="mt-2 text-sm text-slate-500">
+          Posted by <span class="font-medium text-slate-700">{{ product.user.username }}</span>
+        </p>
+        
+        <p class="mt-4 text-3xl font-bold text-blue-600">Rp {{ product.price|floatformat:0 }}</p>
+        
+        <p class="mt-4 text-slate-600 leading-relaxed">{{ product.description }}</p>
+        
+        <div class="mt-6 pt-6 border-t border-slate-200">
+          <dl class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+            <div>
+              <dt class="font-medium text-slate-500">Brand</dt>
+              <dd class="text-slate-800 font-semibold">{{ product.brand|default:"N/A" }}</dd>
+            </div>
+            <div>
+              <dt class="font-medium text-slate-500">Stock</dt>
+              <dd class="text-slate-800 font-semibold">{{ product.stock|default:"N/A" }}</dd>
+            </div>
+          </dl>
+        </div>
+        
+        <div class="mt-auto pt-8">
+          {% if user.is_authenticated and product.user == user %}
+            <div class="flex items-center gap-x-3">
+              <a href="{% url 'main:edit_product' product.id %}" class="flex-1 text-center px-5 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition">
+                Edit Product
+              </a>
+              <a href="{% url 'main:delete_product' product.id %}" onclick="return confirm('Are you sure?')" class="px-4 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition">
+                🗑️
+              </a>
+            </div>
+          {% else %}
+            <a href="#" class="block w-full text-center px-5 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition">
+              Add to Cart
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
 
-{% if product.thumbnail %}
-<img src="{{ product.thumbnail }}" alt="Product thumbnail" width="300">
-<br /><br />
-{% endif %}
-<p>Brand: {{ product.brand }}</p>
-<p>Harga: {{ product.price }}</p>
-<p>Stok: {{ product.stock }}</p>
-<p>{{ product.description }}</p>
-
-{% if product.user %}
-    <p>Author: {{ product.user.username }}</p>
-{% else %}
-    <p>Author: Anonymous</p>
-{% endif %}
-
+    
+  </div>
+</div>
 {% endblock content %}
