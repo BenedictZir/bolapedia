@@ -17,9 +17,9 @@
       The ultimate hub for the football community to share and find amazing products.
     </p>
     <div class="mt-8 flex justify-center items-center gap-x-4">
-      <a href="{% url 'main:create_product' %}" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition">
+      <button onclick="showModal()" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition">
         Add Your Product
-      </a>
+      </button>
       <a href="#products" class="px-6 py-3 bg-white text-slate-700 font-semibold rounded-lg border border-slate-300 hover:bg-slate-100 transition">
         Explore Products
       </a>
@@ -46,7 +46,7 @@
           <div class="w-10 h-10 bg-green-100 text-green-600 rounded-lg flex items-center justify-center text-xl">📦</div>
           <div class="ml-4">
             <p class="text-sm text-slate-500">Total Products</p>
-            <p class="font-bold text-slate-800">{{ product_list|length }}</p>
+            <p id="product-count" class="font-bold text-slate-800">Loading...</p>
           </div>
         </div>
       </div>
@@ -61,48 +61,239 @@
       </div>
     </div>
     {% endif %}
-
+    
     <div class="mb-10">
       <h2 class="text-3xl font-bold text-slate-900">Latest Products</h2>
       <div class="mt-4 border-b border-slate-200">
         <nav class="-mb-px flex space-x-6">
-          <a href="?" class="py-3 px-1 border-b-2 font-semibold {% if request.GET.filter == 'all' or not request.GET.filter %}border-blue-600 text-blue-600{% else %}border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300{% endif %}">
+          <a id="filter-all" class="cursor-pointer py-3 px-1 border-b-2 font-semibold">
             All Products
           </a>
-          <a href="?filter=my" class="py-3 px-1 border-b-2 font-semibold {% if request.GET.filter == 'my' %}border-blue-600 text-blue-600{% else %}border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300{% endif %}">
+          <a id="filter-my" class="cursor-pointer py-3 px-1 border-b-2 font-semibold">
             My Products
           </a>
         </nav>
       </div>
     </div>
 
-    {% if not product_list %}
-      <div class="text-center py-16 px-6 border-2 border-dashed border-slate-300 rounded-xl">
-        <div class="text-4xl mb-4">⚽</div>
-        <h3 class="text-xl font-semibold text-slate-800">No Products Yet!</h3>
-        <p class="text-slate-500 mt-2">Be the first to share an amazing product with the community.</p>
-        <a href="{% url 'main:create_product' %}" class="mt-6 inline-block px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition">
-          Create First Product
-        </a>
-      </div>
-    {% else %}
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-        {% for product in product_list %}
-          <div>
-            {% include 'card_product.html' with product=product %}
-          </div>
-        {% endfor %}
-      </div>
-    {% endif %}
+    <div id="loading" class="text-center py-16 hidden">
+      <svg class="animate-spin h-8 w-8 text-blue-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+      </svg>
+      <p class="text-slate-600 mt-4">Loading products...</p>
+    </div>
+
+    <div id="error" class="hidden text-center py-16 px-6 border-2 border-dashed border-red-300 rounded-xl">
+        <h3 class="text-xl font-semibold text-red-800">Oops! Something went wrong.</h3>
+        <p class="text-slate-500 mt-2">Could not fetch product data. Please try again later.</p>
+    </div>
+
+    <div id="grid" class="hidden"></div>
+
+    <div id="empty" class="text-center py-16 px-6 border-2 border-dashed border-slate-300 rounded-xl hidden">
+      <div class="text-4xl mb-4">⚽</div>
+      <h3 class="text-xl font-semibold text-slate-800">No Products Found!</h3>
+      <p class="text-slate-500 mt-2">Be the first to share an amazing product with the community.</p>
+      <button onclick="showModal()" class="mt-6 inline-block px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition">
+        Create First Product
+      </button>
+    </div>
   </div>
 </div>
-
 {% if user.is_authenticated %}
 <div class="fixed bottom-6 right-6 z-40">
-  <a href="{% url 'main:create_product' %}" class="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl shadow-lg hover:bg-blue-700 transition">
-    <span>+</span>
+    <button onclick="showModal()" class="inline-flex items-center px-4 py-2 bg-white text-blue-600 font-semibold outline outline-2 outline-blue-600 outline-offset-[-2px] rounded-md hover:bg-blue-600 hover:text-white transition-colors mb-4">
+      Create Product by AJAX
+    </button>
   </a>
 </div>
 {% endif %}
+<script>
+// --- KONFIGURASI ---
+const PRODUCTS_API_ENDPOINT = "{% url 'main:show_json' %}";
+const CURRENT_USER_ID = "{{ user.id|default_if_none:'' }}";
 
+// --- ELEMEN DOM ---
+const loadingSpinner = document.getElementById('loading');
+const errorMessage = document.getElementById('error');
+const emptyStateDisplay = document.getElementById('empty');
+const productGridContainer = document.getElementById('grid');
+const showAllProductsButton = document.getElementById('filter-all');
+const showMyProductsButton = document.getElementById('filter-my');
+const productCountElement = document.getElementById('product-count');
+
+// --- STATE ---
+let activeFilter = 'all';
+let allProductsData = [];
+
+// --- FUNGSI TAMPILAN (UI FUNCTIONS) ---
+
+function updateFilterButtonsAppearance() {
+  if (!showAllProductsButton || !showMyProductsButton) return;
+  
+  const activeClasses = 'border-blue-600 text-blue-600';
+  const inactiveClasses = 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300';
+  
+  if (activeFilter === 'all') {
+    showAllProductsButton.className = `cursor-pointer py-3 px-1 border-b-2 font-semibold ${activeClasses}`;
+    showMyProductsButton.className = `cursor-pointer py-3 px-1 border-b-2 font-semibold ${inactiveClasses}`;
+  } else {
+    showMyProductsButton.className = `cursor-pointer py-3 px-1 border-b-2 font-semibold ${activeClasses}`;
+    showAllProductsButton.className = `cursor-pointer py-3 px-1 border-b-2 font-semibold ${inactiveClasses}`;
+  }
+}
+
+function displayPageSection({ showLoading = false, showError = false, showEmpty = false, showGrid = false }) {
+  loadingSpinner.classList.toggle('hidden', !showLoading);
+  errorMessage.classList.toggle('hidden', !showError);
+  emptyStateDisplay.classList.toggle('hidden', !showEmpty);
+  productGridContainer.classList.toggle('hidden', !showGrid);
+  
+  if (showGrid) {
+    productGridContainer.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8';
+  }
+}
+
+// --- FUNGSI DATA ---
+
+function getReadableCategoryName(categoryCode) {
+  const categoryMapping = {
+    'baju': 'Baju',
+    'celana': 'Celana',
+    'sepatu': 'Sepatu',
+    'topi': 'Topi',
+    'kaus kaki': 'Kaus Kaki',
+    'sarung tangan': 'Sarung Tangan',
+    'lainnya': 'Lainnya'
+  };
+  return categoryMapping[categoryCode] || categoryCode;
+}
+
+function buildProductCardElement(item) {
+    const card = document.createElement('div');
+    card.className = 'bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 flex flex-col';
+
+    const linkDetail = `{% url 'main:show_product' '00000000-0000-0000-0000-000000000000' %}`.replace('00000000-0000-0000-0000-000000000000', item.id);
+    const linkEdit = `{% url 'main:edit_product' '00000000-0000-0000-0000-000000000000' %}`.replace('00000000-0000-0000-0000-000000000000', item.id);
+    const linkDelete = `{% url 'main:delete_product' '00000000-0000-0000-0000-000000000000' %}`.replace('00000000-0000-0000-0000-000000000000', item.id);
+    
+    const name = item.name;
+    const thumbnail = item.thumbnail;
+    const price = new Intl.NumberFormat('id-ID').format(item.price);
+    const categoryLabel = getReadableCategoryName(item.category);
+    
+    const thumbnailHtml = thumbnail
+        ? `<img src="${thumbnail}" alt="${name}" class="w-full h-full object-cover">`
+        : `<div class="w-full h-full bg-slate-100 flex items-center justify-center text-5xl text-slate-400">⚽</div>`;
+
+    const editDeleteHtml = CURRENT_USER_ID && Number(CURRENT_USER_ID) === Number(item.user_id)
+        ? `<div class="flex items-center gap-x-2">
+            <a href="${linkEdit}" class="text-xs font-medium text-slate-600 hover:text-blue-600">Edit</a>
+            <span class="text-slate-300">|</span>
+            <a href="${linkDelete}" onclick="return confirm('Are you sure you want to delete this product?')" class="text-xs font-medium text-slate-600 hover:text-red-600">Delete</a>
+          </div>`
+        : '';
+
+    const cardHtml = `
+      <div class="aspect-square relative">
+        ${thumbnailHtml}
+        <div class="absolute top-3 left-3">
+          <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">${categoryLabel}</span>
+        </div>
+      </div>
+      <div class="p-4 flex flex-col flex-1">
+        <h3 class="font-bold text-slate-800 text-lg mb-1 leading-tight">
+          <a href="${linkDetail}" class="hover:text-blue-600 transition-colors">${name}</a>
+        </h3>
+        <p class="text-blue-600 font-semibold mb-3">Rp ${price}</p>
+        <div class="mt-auto flex items-center justify-between pt-3 border-t border-slate-100">
+            <a href="${linkDetail}" class="text-sm font-semibold text-blue-600 hover:text-blue-800">View Details</a>
+            ${editDeleteHtml}
+        </div>
+      </div>
+    `;
+
+    card.innerHTML = cardHtml;
+    return card;
+}
+
+function renderAllProductCards(productItems) {
+  productGridContainer.innerHTML = '';
+  productItems.forEach(productItem => {
+    const cardElement = buildProductCardElement(productItem);
+    productGridContainer.appendChild(cardElement);
+  });
+}
+
+function filterAndDisplayProducts() {
+  updateFilterButtonsAppearance();
+  
+  const filteredProducts = activeFilter === 'all' 
+    ? allProductsData 
+    : allProductsData.filter(product => Number(product.user_id) === Number(CURRENT_USER_ID));
+  
+  if (filteredProducts.length === 0) {
+    displayPageSection({ showEmpty: true });
+  } else {
+    renderAllProductCards(filteredProducts);
+    displayPageSection({ showGrid: true });
+  }
+}
+
+async function fetchProductsFromServer() {
+  try {
+    displayPageSection({ showLoading: true });
+    
+    const response = await fetch(PRODUCTS_API_ENDPOINT);
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch product data from server');
+    }
+
+    const data = await response.json();
+    allProductsData = data || [];
+
+    if(productCountElement) {
+        productCountElement.textContent = allProductsData.length;
+    }
+    
+    filterAndDisplayProducts();
+  } catch (error) {
+    console.error('Error loading products:', error);
+    displayPageSection({ showError: true });
+  }
+}
+
+// --- EVENT HANDLERS ---
+function handleShowAllProductsClick() {
+  activeFilter = 'all';
+  filterAndDisplayProducts();
+}
+
+function handleShowMyProductsClick() {
+  if (!CURRENT_USER_ID) {
+    window.location.href = "{% url 'main:login' %}";
+    return;
+  }
+  activeFilter = 'my';
+  filterAndDisplayProducts();
+}
+
+// --- INISIALISASI ---
+function initializeProductPage() {
+  showAllProductsButton.addEventListener('click', handleShowAllProductsClick);
+  showMyProductsButton.addEventListener('click', handleShowMyProductsClick);
+  
+  fetchProductsFromServer();
+}
+
+initializeProductPage();
+
+// Event listener untuk me-refresh data setelah produk baru ditambahkan melalui modal
+document.addEventListener('productAdded', function() {
+    fetchProductsFromServer();
+});
+
+</script>
 {% endblock content %}

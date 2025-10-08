@@ -162,5 +162,29 @@ Tugas 5:
     - Untuk kustomisasi menggunakan css, di base.html kita beri script dari tailwind dulu agar semua halaman yang mengextend base.html menggunakan tailwind.
     - Selain itu kita juga membuat static file global.css berisi beberapa konfigurasi form dan checkbox agar semua halaman punya desain yang seragam.
     - Untuk navbar, saya membuat navbar.html berisi tombol tombol seperti create product,  nama menggunakan tailwind. Di main.html saya buat include navbar diatas bagian halamannya. Di halaman navbar dibuat 2 versi untuk size medium dan jika size besar agar responsive.
-    - Untuk halaman lain menggunakan tailwind juga dengan style yang mirip-mirip
+    - Untuk halaman lain menggunakan tailwind juga dengan style yang mirip-mirip.
+
+Tugas 6:
+
+1.  Apa perbedaan antara synchronous request dan asynchronous request?
+    - Synchronus request: browser menunggu respons server sebelum melanjutkan aktivitas lain.
+    - Asynchronus request: browser tidak perlu menunggu dan bisa sambil melanjutkan aktivitas lain selagi menunggu respon.
     
+2.  Bagaimana AJAX bekerja di Django (alur request–response)?
+    - JavaScript mengirimkan request ke server Django melalui endpoint khusus tanpa me reload halaman. View Django akan menerima request tersebut, memproses datanya dan mengembalikan JSON response. JavaScript menerima response tersebut dan mengupdate tampilan layar tanpa mereload satu halaman.
+
+3.  Apa keuntungan menggunakan AJAX dibandingkan render biasa di Django?
+    - Lebih cepat dan efisien karna hanya data yang diperlukan yang dikirim bukan satu halaman HTML. 
+    - Bisa update sebagian halaman secara real time.
+    - Tidak perlu reload agar halaman terupdate sehingga terasa lebih smooth.
+
+4.  Bagaimana cara memastikan keamanan saat menggunakan AJAX untuk fitur Login dan Register di Django?
+    - Menggunakan CSRF Token
+    - Validasi input di server
+    - Menggunakan HTTPS
+    - Membatasi data di JSON response
+
+5.  Bagaimana AJAX mempengaruhi pengalaman pengguna (User Experience) pada website?
+    - Website terasa cepat dan interaktif 
+    - User mendapat feedback secara real time
+    - Transisi antar konten terasa lebih smooth
