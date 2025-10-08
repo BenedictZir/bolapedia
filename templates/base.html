@@ -1,19 +1,45 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     {% block meta %} {% endblock meta %}
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="{% static 'css/global.css' %}"/>
-  </head>
-  <body>
-    {% block content %} 
-    
+</head>
+<body>
+    {% block content %}
     {% endblock content %}
-    
+
     {% include 'toast.html' %}
     {% include 'modal.html' %}
-  </body>
+
+    {% if messages %}
+    <script>
+        window.addEventListener('load', function() {
+            {% for message in messages %}
+                (function() {
+                    let message_level = "{{ message.level_tag }}";
+                    let toast_type = 'normal';
+                    let title = "Notification";
+
+                    if (message_level === 'success') {
+                        toast_type = 'success';
+                        title = "Success!";
+                    } else if (message_level === 'error') {
+                        toast_type = 'error';
+                        title = "Action Completed"; // Mengubah "Deleted!" agar lebih umum
+                    } else if (message_level === 'info') {
+                        title = "Info";
+                    }
+                    
+                    // Memanggil fungsi showToast dari static/js/toast.js
+                    showToast(title, "{{ message|escapejs }}", toast_type);
+                })();
+            {% endfor %}
+        });
+    </script>
+    {% endif %}
+</body>
 </html>

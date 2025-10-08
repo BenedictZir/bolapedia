@@ -73,6 +73,12 @@
             My Products
           </a>
         </nav>
+        <button id="refresh-products-btn" class="p-2 rounded-md hover:bg-slate-100 transition text-slate-500" title="Refresh Products">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+          </svg>
+        </button>
       </div>
     </div>
 
@@ -122,6 +128,8 @@ const productGridContainer = document.getElementById('grid');
 const showAllProductsButton = document.getElementById('filter-all');
 const showMyProductsButton = document.getElementById('filter-my');
 const productCountElement = document.getElementById('product-count');
+const refreshButton = document.getElementById('refresh-products-btn');
+
 
 // --- STATE ---
 let activeFilter = 'all';
@@ -244,7 +252,9 @@ function filterAndDisplayProducts() {
 async function fetchProductsFromServer() {
   try {
     displayPageSection({ showLoading: true });
-    
+
+    refreshButton.classList.add('animate-spin');
+
     const response = await fetch(PRODUCTS_API_ENDPOINT);
 
     if (!response.ok) {
@@ -262,6 +272,8 @@ async function fetchProductsFromServer() {
   } catch (error) {
     console.error('Error loading products:', error);
     displayPageSection({ showError: true });
+  } finally {
+    refreshButton.classList.remove('animate-spin');
   }
 }
 
@@ -284,7 +296,8 @@ function handleShowMyProductsClick() {
 function initializeProductPage() {
   showAllProductsButton.addEventListener('click', handleShowAllProductsClick);
   showMyProductsButton.addEventListener('click', handleShowMyProductsClick);
-  
+  refreshButton.addEventListener('click', fetchProductsFromServer);
+
   fetchProductsFromServer();
 }
 

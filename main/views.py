@@ -13,6 +13,7 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.utils.html import strip_tags
+from django.contrib import messages
 
 @login_required(login_url="/login")
 def show_main(request):
@@ -41,6 +42,7 @@ def create_product(request):
         product_entry = form.save(commit = False)
         product_entry.user = request.user
         product_entry.save()
+        messages.success(request, f"Product '{product_entry.name}' was created successfully!")
         return redirect('main:show_main')
     
     context = {'form': form}
@@ -135,6 +137,7 @@ def login_user(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
+            messages.success(request, f"Welcome back, {user.username}!")
             response = HttpResponseRedirect(reverse("main:show_main"))
             response.set_cookie('last_login', str(datetime.datetime.now()))
             
@@ -147,6 +150,7 @@ def login_user(request):
 
 def logout_user(request):
     logout(request)
+    messages.info(request, "You have been successfully logged out.")
     response = HttpResponseRedirect(reverse('main:login'))
     response.delete_cookie('last_login')
     return redirect('main:login')
@@ -166,7 +170,10 @@ def edit_product(request, id):
 
 def delete_product(request, id):
     product = get_object_or_404(Product, pk=id)
+    product_name = product.name
     product.delete()
+    messages.error(request, f"Product '{product_name}' has been deleted.")
+
     return HttpResponseRedirect(reverse('main:show_main'))
 
 @csrf_exempt
