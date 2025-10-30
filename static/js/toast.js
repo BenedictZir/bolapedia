@@ -7,7 +7,6 @@ function showToast(title, message, type = 'normal', duration = 4000) {
 
     if (!toastComponent) return;
 
-    // Reset classes
     toastComponent.className = 'fixed bottom-8 right-8 p-4 rounded-xl shadow-xl z-50 opacity-0 transition-all duration-300 transform translate-y-full flex items-start gap-4';
 
     let bgColor, borderColor, textColor, iconSvg;
@@ -39,7 +38,6 @@ function showToast(title, message, type = 'normal', duration = 4000) {
     toastTitle.textContent = title;
     toastMessage.textContent = message;
     
-    // Tampilkan toast
     toastComponent.classList.remove('opacity-0', 'translate-y-full');
     toastComponent.classList.add('opacity-100', 'translate-y-0');
 

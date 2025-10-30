@@ -2,10 +2,10 @@
   <div id="crudModalContent" class="bg-white rounded-lg shadow-lg w-5/6 sm:w-3/5 md:w-1/2 lg:w-2/5 xl:w-1/3 max-h-screen overflow-y-auto">
     <div class="flex items-center justify-between p-4 border-b">
       <div>
-        <h3 class="text-xl font-semibold text-gray-900">
+        <h3 id="modalTitle" class="text-xl font-semibold text-gray-900">
           Create New Product
         </h3>
-        <p class="text-sm text-gray-600 mt-1">Add a new product to Bolapedia</p>
+        <p id="modalDescription" class="text-sm text-gray-600 mt-1">Add a new product to Bolapedia</p>
       </div>
       <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center" onclick="hideModal()">
         <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -16,6 +16,7 @@
     </div>
     <div class="px-6 py-4 space-y-6 form-style">
       <form id="productForm">
+        <input type="hidden" id="product_id" name="product_id">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="mb-4">
               <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
@@ -67,15 +68,67 @@
     </div>
     <div class="flex flex-col sm:flex-row gap-4 p-6 border-t border-gray-200 rounded-b">
       <button type="button" id="cancelButton" class="order-2 sm:order-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-md font-medium hover:bg-gray-50 transition-colors text-center" onclick="hideModal()">Cancel</button>
-      <button type="submit" id="submitProduct" form="productForm" class="order-1 sm:order-2 flex-1 bg-blue-600 text-white px-6 py-3 rounded-md font-medium hover:bg-blue-700 transition-colors">Create Product</button>
+      <button type="submit" id="submitProductButton" form="productForm" class="order-1 sm:order-2 flex-1 bg-blue-600 text-white px-6 py-3 rounded-md font-medium hover:bg-blue-700 transition-colors">Create Product</button>
     </div>
   </div>
 </div>
 <script>
-  function showModal() {
-      const modal = document.getElementById('crudModal');
-      modal.classList.remove('hidden'); 
-  }
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+const csrftoken = getCookie('csrftoken');
+
+function showCreateModal() {
+    const modal = document.getElementById('crudModal');
+    
+    document.getElementById("productForm").reset();
+    document.getElementById("product_id").value = "";
+    document.getElementById("modalTitle").textContent = "Create New Product";
+    document.getElementById("modalDescription").textContent = "Add a new product to Bolapedia";
+    document.getElementById("submitProductButton").textContent = "Create Product";
+    
+    modal.classList.remove('hidden'); 
+}
+async function showEditModal(id) {
+    const modal = document.getElementById('crudModal');
+    const form = document.getElementById("productForm");
+
+    document.getElementById("modalTitle").textContent = "Edit Product";
+    document.getElementById("modalDescription").textContent = "Update the product details below.";
+    document.getElementById("submitProductButton").textContent = "Save Changes";
+
+    try {
+        const productDetailUrl = `{% url 'main:show_json_by_id' '00000000-0000-0000-0000-000000000000' %}`.replace('00000000-0000-0000-0000-000000000000', id);
+        const response = await fetch(productDetailUrl);
+        const product = await response.json();
+
+        form.name.value = product.name;
+        form.price.value = product.price;
+        form.description.value = product.description;
+        form.brand.value = product.brand;
+        form.stock.value = product.stock;
+        form.category.value = product.category;
+        form.thumbnail.value = product.thumbnail;
+        form.is_featured.checked = product.is_featured;
+        form.product_id.value = product.id;
+
+        modal.classList.remove('hidden'); 
+    } catch (error) {
+        console.error('Failed to fetch product for editing:', error);
+        showToast('Failed to load product details.', '', 'error');
+    }
+}
 
   function hideModal() {
       const modal = document.getElementById('crudModal');
@@ -85,21 +138,42 @@
     await fetch("{% url 'main:add_product_entry_ajax' %}", {
       method: "POST",
       body: new FormData(document.querySelector('#productForm')),
+      headers: { "X-CSRFToken": csrftoken },
     })
 
     document.getElementById("productForm").reset();
     hideModal();
       
-    // Show toast notification
     showToast('Product added successfully!', '', 'success');
 
-    // Dispatch custom event to notify main.html about new data
     document.dispatchEvent(new CustomEvent('productAdded'));
 
     return false;
   }
+  async function updateProductEntry(id) {
+    const updateUrl = `/update-product-ajax/${id}/`;
+
+    await fetch(updateUrl, {
+      method: "POST", 
+      body: new FormData(document.querySelector('#productForm')),
+      headers: { "X-CSRFToken": csrftoken } 
+    });
+
+    document.getElementById("productForm").reset();
+    hideModal();
+    showToast('Product updated successfully!', '', 'success');
+    document.dispatchEvent(new CustomEvent('productAdded')); 
+    return false;
+}
   document.getElementById("productForm").addEventListener("submit", function(e) {
     e.preventDefault();
-    addProductEntry();
+    
+    const productId = document.getElementById('product_id').value;
+    
+    if (productId) {
+        updateProductEntry(productId);
+    } else {
+        addProductEntry();
+    }
 })
 </script>

@@ -15,12 +15,12 @@ class Product(models.Model):
     ]
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=50)
-    price = models.IntegerField()
+    price = models.PositiveIntegerField()
     description = models.TextField()
     thumbnail = models.URLField(blank=True, null=True)
     category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, default= 'lainnya')
     is_featured = models.BooleanField(default=False)
-    stock = models.IntegerField(default=0)
+    stock = models.PositiveIntegerField(default=0)
     brand = models.CharField(max_length=50, blank=True)
     
     def __str__(self):

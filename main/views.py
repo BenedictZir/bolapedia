@@ -186,7 +186,7 @@ def add_product_entry_ajax(request):
     brand = request.POST.get("brand")
     stock = request.POST.get("stock")
     price = request.POST.get("price")
-    is_featured = request.POST.get("is_featured") == 'on'  # checkbox handling
+    is_featured = request.POST.get("is_featured") == 'on'  
     user = request.user
 
     new_product = Product(
@@ -203,3 +203,40 @@ def add_product_entry_ajax(request):
     new_product.save()
 
     return HttpResponse(b"CREATED", status=201)
+
+
+@login_required
+@require_POST
+def update_product_ajax(request, id):
+    try:
+        product = get_object_or_404(Product, pk=id)
+        if product.user == request.user:
+            product.name = request.POST.get("name")
+            product.price = request.POST.get("price")
+            product.description = request.POST.get("description")
+            product.category = request.POST.get("category")
+            product.thumbnail = request.POST.get("thumbnail")
+            product.is_featured = request.POST.get("is_featured") == 'on'
+            product.brand = request.POST.get("brand")
+            product.stock = request.POST.get("stock")
+            product.save()
+            return JsonResponse({'status': 'success', 'message': 'Product updated.'})
+        else:
+            return JsonResponse({'status': 'error', 'message': 'Unauthorized.'}, status=403)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    
+@login_required
+@require_POST 
+def delete_product_ajax(request, id):
+    try:
+        product = get_object_or_404(Product, pk=id)
+        
+        if product.user != request.user:
+            return JsonResponse({'status': 'error', 'message': 'Unauthorized'}, status=403)
+            
+        product.delete()
+        return JsonResponse({'status': 'success', 'message': 'Product deleted.'})
+        
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)

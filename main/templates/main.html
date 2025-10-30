@@ -17,7 +17,7 @@
       The ultimate hub for the football community to share and find amazing products.
     </p>
     <div class="mt-8 flex justify-center items-center gap-x-4">
-      <button onclick="showModal()" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition">
+      <button onclick="showCreateModal()" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition">
         Add Your Product
       </button>
       <a href="#products" class="px-6 py-3 bg-white text-slate-700 font-semibold rounded-lg border border-slate-300 hover:bg-slate-100 transition">
@@ -101,7 +101,7 @@
       <div class="text-4xl mb-4">⚽</div>
       <h3 class="text-xl font-semibold text-slate-800">No Products Found!</h3>
       <p class="text-slate-500 mt-2">Be the first to share an amazing product with the community.</p>
-      <button onclick="showModal()" class="mt-6 inline-block px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition">
+      <button onclick="showCreateModal()" class="mt-6 inline-block px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition">
         Create First Product
       </button>
     </div>
@@ -109,18 +109,16 @@
 </div>
 {% if user.is_authenticated %}
 <div class="fixed bottom-6 right-6 z-40">
-    <button onclick="showModal()" class="inline-flex items-center px-4 py-2 bg-white text-blue-600 font-semibold outline outline-2 outline-blue-600 outline-offset-[-2px] rounded-md hover:bg-blue-600 hover:text-white transition-colors mb-4">
+    <button onclick="showCreateModal()" class="inline-flex items-center px-4 py-2 bg-white text-blue-600 font-semibold outline outline-2 outline-blue-600 outline-offset-[-2px] rounded-md hover:bg-blue-600 hover:text-white transition-colors mb-4">
       Create Product by AJAX
     </button>
   </a>
 </div>
 {% endif %}
 <script>
-// --- KONFIGURASI ---
 const PRODUCTS_API_ENDPOINT = "{% url 'main:show_json' %}";
 const CURRENT_USER_ID = "{{ user.id|default_if_none:'' }}";
 
-// --- ELEMEN DOM ---
 const loadingSpinner = document.getElementById('loading');
 const errorMessage = document.getElementById('error');
 const emptyStateDisplay = document.getElementById('empty');
@@ -131,11 +129,9 @@ const productCountElement = document.getElementById('product-count');
 const refreshButton = document.getElementById('refresh-products-btn');
 
 
-// --- STATE ---
 let activeFilter = 'all';
 let allProductsData = [];
 
-// --- FUNGSI TAMPILAN (UI FUNCTIONS) ---
 
 function updateFilterButtonsAppearance() {
   if (!showAllProductsButton || !showMyProductsButton) return;
@@ -163,7 +159,6 @@ function displayPageSection({ showLoading = false, showError = false, showEmpty 
   }
 }
 
-// --- FUNGSI DATA ---
 
 function getReadableCategoryName(categoryCode) {
   const categoryMapping = {
@@ -194,13 +189,14 @@ function buildProductCardElement(item) {
     const thumbnailHtml = thumbnail
         ? `<img src="${thumbnail}" alt="${name}" class="w-full h-full object-cover">`
         : `<div class="w-full h-full bg-slate-100 flex items-center justify-center text-5xl text-slate-400">⚽</div>`;
-
+        
+    const ajaxDeleteUrl = `{% url 'main:delete_product_ajax' '00000000-0000-0000-0000-000000000000' %}`.replace('00000000-0000-0000-0000-000000000000', item.id);
     const editDeleteHtml = CURRENT_USER_ID && Number(CURRENT_USER_ID) === Number(item.user_id)
         ? `<div class="flex items-center gap-x-2">
-            <a href="${linkEdit}" class="text-xs font-medium text-slate-600 hover:text-blue-600">Edit</a>
-            <span class="text-slate-300">|</span>
-            <a href="${linkDelete}" onclick="return confirm('Are you sure you want to delete this product?')" class="text-xs font-medium text-slate-600 hover:text-red-600">Delete</a>
-          </div>`
+               <a onclick="showEditModal('${item.id}')" class="cursor-pointer text-xs font-medium text-slate-600 hover:text-blue-600">Edit</a>
+               <span class="text-slate-300">|</span>
+               <a onclick="showDeleteModal('${ajaxDeleteUrl}')" class="cursor-pointer text-xs font-medium text-slate-600 hover:text-red-600">Delete</a>
+           </div>`
         : '';
 
     const cardHtml = `
@@ -231,7 +227,13 @@ function renderAllProductCards(productItems) {
   productItems.forEach(productItem => {
     const cardElement = buildProductCardElement(productItem);
     productGridContainer.appendChild(cardElement);
-  });
+    const editButton = cardElement.querySelector(`#edit-btn-${productItem.id}`);
+    if (editButton) {
+        editButton.addEventListener('click', () => {
+          showEditModal(productItem.id); 
+    });
+}
+  }); 
 }
 
 function filterAndDisplayProducts() {
@@ -277,7 +279,6 @@ async function fetchProductsFromServer() {
   }
 }
 
-// --- EVENT HANDLERS ---
 function handleShowAllProductsClick() {
   activeFilter = 'all';
   filterAndDisplayProducts();
@@ -292,7 +293,6 @@ function handleShowMyProductsClick() {
   filterAndDisplayProducts();
 }
 
-// --- INISIALISASI ---
 function initializeProductPage() {
   showAllProductsButton.addEventListener('click', handleShowAllProductsClick);
   showMyProductsButton.addEventListener('click', handleShowMyProductsClick);
@@ -303,7 +303,6 @@ function initializeProductPage() {
 
 initializeProductPage();
 
-// Event listener untuk me-refresh data setelah produk baru ditambahkan melalui modal
 document.addEventListener('productAdded', function() {
     fetchProductsFromServer();
 });
